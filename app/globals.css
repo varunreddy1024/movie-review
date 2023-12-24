@@ -67,8 +67,8 @@ button {
     padding: 10px 15px;
     background-color: #dc3545;
     color: #fff;
-    border: none;
     cursor: pointer;
+    border: none;
 }
 
 .main-form-button:hover {
@@ -79,7 +79,7 @@ button {
 .main-form-button {
     padding: 10px 15px;
     color: #fff;
-    border: none;
+    border: 1px solid #dc3545;
     cursor: pointer;
     margin: 10px;
     border-radius: 10px;
@@ -121,4 +121,10 @@ button {
     flex-direction: column;
     padding: 5px;
     margin: 10px;
+}
+
+.main-profile {
+    display: flex;
+    margin: 20px;
+    color: #0c0c0c;
 }
