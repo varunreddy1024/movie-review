@@ -173,17 +173,17 @@ const MovieReviewPage = () => {
         </div>
       ) : (
         <div>
-          <h1>Login</h1>
-          <form>
+          <h1 className='main-welcome'>Login</h1>
+          <form className='main-form'>
             <div>
-              <label>Email:</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <label className='color-red'>Email:</label>
+              <input type="email" className='form-input' value={email} onChange={(e) => setEmail(e.target.value) } />
             </div>
             <div>
-              <label>Password:</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <label className='color-red'>Password:</label>
+              <input type="password" className='form-input' value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
-            <button type="button" onClick={handleSignIn}>
+            <button type="button" onClick={handleSignIn} className='main-form-button'>
               Sign In
             </button>
           </form>

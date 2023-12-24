@@ -42,7 +42,7 @@ li {
 .color-red {
     color: #bd2130;
     font-size: 20px;
-    margin-right: 10px;
+    margin: 10px;
 }
 
 .color-red-bold {
@@ -50,15 +50,6 @@ li {
     font-size: 30px;
     margin-right: 10px;
     font-weight: bold;
-}
-
-.color-red-middle {
-    color: #bd2130;
-    font-size: 30px;
-    margin-right: 10px;
-    font-weight: bold;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 a {
