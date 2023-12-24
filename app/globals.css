@@ -1,27 +1,133 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+     :root {
+        --foreground-rgb: 255, 255, 255;
+        --background-start-rgb: 0, 0, 0;
+        --background-end-rgb: 0, 0, 0;
+    }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient( to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+    margin: 20px;
+}
+
+form {
+    color: black;
+}
+
+textarea {
+    color: black;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+    /* Optional: Adjust spacing between list items */
+}
+
+.color-red {
+    color: #bd2130;
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.color-red-bold {
+    color: #bd2130;
+    font-size: 30px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.color-red-middle {
+    color: #bd2130;
+    font-size: 30px;
+    margin-right: 10px;
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+a {
+    color: #007bff;
+    /* Set the desired color for the link */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    /* Optional: Add underline on hover */
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.main-form-button:hover {
+    background-color: #bd2130;
+    /* Optional: Change background color on hover */
+}
+
+.main-form-button {
+    padding: 10px 15px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+.main-welcome {
+    color: #333;
+    font-size: 40px;
+    font-weight: bolder;
+}
+
+.main-heading {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.main-form {
+    display: flex;
+    flex-direction: row;
+    width: 70%;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    margin-top: 50px;
+}
+
+.form-input {
+    background-color: #929292;
+    border-radius: 10px;
+    width: 300px;
+    height: 30px;
+    font-weight: bold;
+}
+
+.movies-list {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    margin: 10px;
 }
