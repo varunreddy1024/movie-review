@@ -114,6 +114,7 @@ button {
     width: 300px;
     height: 30px;
     font-weight: bold;
+    color: #000;
 }
 
 .movies-list {
@@ -142,6 +143,12 @@ button {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+}
+
+.flex-col {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
 }
 
 .movie-review-img {
