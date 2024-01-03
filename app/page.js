@@ -29,6 +29,38 @@ const MovieReviewPage = () => {
   const [user, setUser] = useState(null);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
+  const [editprofile,SetEditprofile] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedMovieId, setSelectedMovieId] = useState(null);
+  const [selectedMovieTitle, setSelectedMovieTitle] = useState(null);
+
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(
+        `https://omdbapi.com/?s=${searchTerm}&apikey=8643ded5`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      setSearchResults(data.Search || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+
+
+  const handleSelectMovie = (result) => {
+    setSelectedMovieId(result.imdbID);
+    setSelectedMovieTitle(result.Title);
+  };
+
 
   useEffect(() => {
     const reviewsRef = ref(database, 'reviews');
@@ -60,20 +92,6 @@ const MovieReviewPage = () => {
             setAge(userData.age || '');
           }
         });
-
-        const userMoviesRef = ref(database, `users/${user.uid}/movies`);
-        onValue(userMoviesRef, (snapshot) => {
-          if (snapshot.exists()) {
-            const userMoviesData = snapshot.val();
-            const userMoviesList = Object.keys(userMoviesData).map((key) => ({
-              id: key,
-              ...userMoviesData[key],
-            }));
-            setMovies(userMoviesList);
-          } else {
-            setMovies([]);
-          }
-        });
       }
     });
 
@@ -93,6 +111,7 @@ const MovieReviewPage = () => {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.error(`Error: ${errorCode}`, errorMessage);
+        handleCreateUser();
       });
   };
 
@@ -106,29 +125,9 @@ const MovieReviewPage = () => {
       });
   };
 
-  const addMovie = () => {
-    if (newMovieTitle) {
-      const user = auth.currentUser;
 
-      if (user) {
-        const userMoviesRef = ref(database, `users/${user.uid}/movies`);
-
-        const newMovieData = {
-          title: newMovieTitle,
-          review: null,
-        };
-
-        const newMovieRef = push(userMoviesRef);
-        set(newMovieRef, newMovieData);
-
-        setNewMovieTitle('');
-      } else {
-        alert('Please sign in to add a movie.');
-      }
-    } else {
-      alert('Please provide a title.');
-    }
-  };
+  
+  
 
   const handleCreateUser = () => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -143,8 +142,9 @@ const MovieReviewPage = () => {
       });
   };
 
-  const handleEditProfile = () => {
+  const handleSaveProfile = () => {
     const user = auth.currentUser;
+    SetEditprofile(true);
 
     if (user) {
       const userRef = ref(database, `users/${user.uid}`);
@@ -159,6 +159,10 @@ const MovieReviewPage = () => {
     } else {
       alert('Please sign in to edit your profile.');
     }
+  };
+
+  const handleEditProfile = () => {
+    SetEditprofile(false);
   };
 
   return (
@@ -179,7 +183,20 @@ const MovieReviewPage = () => {
             </div>
           </div>
 
-          <div className='main-profile'>
+          {editprofile ? <div> 
+            <div className='main-profile'>
+          <div>
+              <label className='color-red'>Name:</label><span className='profile-main'>{name}</span>
+            </div>
+            <div>
+              <label className='color-red'>Age:</label><span className='profile-main'>{age}</span>
+            </div>
+          </div>
+          <button type="button" onClick={handleEditProfile} className='main-form-button'>
+              Edit Profile
+            </button>
+          </div> : <div> 
+            <div className='main-profile'>
           <div>
               <label className='color-red'>Name:</label>
               <input
@@ -199,38 +216,48 @@ const MovieReviewPage = () => {
               />
             </div>
           </div>
-          <button type="button" onClick={handleEditProfile} className='main-form-button'>
+          <button type="button" onClick={handleSaveProfile} className='main-form-button'>
               Save Profile
             </button>
-
-          <form className='main-form'>
-            <div>
-              <label className='color-red'>Title:</label>
-              <input
-                className='form-input'
-                type="text"
-                value={newMovieTitle}
-                onChange={(e) => setNewMovieTitle(e.target.value)}
-              />
-            </div>
-            <button type="button" onClick={addMovie} className='main-form-button'>
-              Add Movie
-            </button>
-          </form>
-
-          <div className='movies-list'>
-            {movies.length > 0 ? (
-              <ul>
-                {movies.map((movie) => (
-                  <li key={movie.id}>
-                    <Link href={`/movie/${movie.id}`}>{movie.title}</Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div>No movies found.</div>
-            )}
           </div>
+
+          }
+
+<div>
+      <input className='form-input'
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)
+        }
+      />
+      <button className='main-form-button ' onClick={handleSearch}>Search</button>
+      
+
+      <ul>
+              {searchResults.map((movie) => (
+                <li key={movie.imdbID} onClick={() => handleSelectMovie(movie)}>
+                <Link href={`/movie/${movie.imdbID}`}>
+                    <div className='flex-row'>
+                      <div>
+                        <img
+                          src={movie.Poster}
+                          alt={`${movie.Title} Poster`}
+                          style={{ width: '85px', height: '130px',margin:'10px' }}
+                        />
+                      </div>
+                      <div>
+                        <p>{movie.Title}</p>
+                        <p>{movie.Year}</p>
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+     
+    </div>
+
+          
         </div>
       ) : (
         <div>
@@ -258,13 +285,15 @@ const MovieReviewPage = () => {
               Sign In
             </button>
           </form>
-
-          <button type="button" onClick={handleCreateUser} className='main-form-button'>
-            Create User
-          </button>
         </div>
       )}
+ 
+      
     </div>
+
+    
+
+    
   );
 };
 

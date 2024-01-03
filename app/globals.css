@@ -105,7 +105,7 @@ button {
     align-items: center;
     justify-content: center;
     margin: auto;
-    margin-top: 50px;
+    margin-top: 5px;
 }
 
 .form-input {
@@ -127,4 +127,36 @@ button {
     display: flex;
     margin: 20px;
     color: #0c0c0c;
+}
+
+.profile-main {
+    color: #868585;
+    font-size: 20px;
+    font-weight: bolder;
+}
+
+
+/* Assuming these class names are available in your stylesheets */
+
+.flex-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.movie-review-img {
+    width: 900px;
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+    margin: 10px;
+}
+
+.movie-details {
+    margin: 10px;
+}
+
+.movie-details p {
+    margin-bottom: 10px;
+    /* Adjust margin as needed */
 }

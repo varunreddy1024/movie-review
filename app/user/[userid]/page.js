@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getDatabase, ref, onValue } from 'firebase/database';
@@ -18,6 +17,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+// ... (previous imports)
 
 const User = ({ params }) => {
   const [userData, setUserData] = useState(null);
@@ -61,7 +62,21 @@ const User = ({ params }) => {
             <ul>
               {movies.map((movie) => (
                 <li key={movie.id}>
-                  <Link href={`/user/${params.userid}/${movie.id}`}>{movie.title}</Link>
+                  <Link href={`/user/${params.userid}/${movie.id}`}>
+                    <div className='flex-row'>
+                      <div>
+                        <img
+                          src={movie.poster}
+                          alt={`${movie.title} Poster`}
+                          style={{ width: '85px', height: '130px',margin:'10px' }}
+                        />
+                      </div>
+                      <div>
+                        <p>{movie.title}</p>
+                        <p>{movie.review}</p>
+                      </div>
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>
