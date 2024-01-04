@@ -18,8 +18,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// ... (previous imports)
-
 const User = ({ params }) => {
   const [userData, setUserData] = useState(null);
   const [movies, setMovies] = useState([]);
@@ -51,10 +49,9 @@ const User = ({ params }) => {
   }, [params.userid]);
 
   return (
-    <div>
+    <div className='movies-list-main'>
       {userData ? (
         <div>
-          <h1 className='main-welcome'>User's Profile</h1>
           <p>{userData.name}</p>
           <p>Age: {userData.age}</p>
           <h2 className='color-red-bold'>Movies List:</h2>
@@ -63,15 +60,15 @@ const User = ({ params }) => {
               {movies.map((movie) => (
                 <li key={movie.id}>
                   <Link href={`/user/${params.userid}/${movie.id}`}>
-                    <div className='flex-row'>
-                      <div>
+                    <div className='review-main'>
+                      <div className='review-list-poster'>
                         <img
                           src={movie.poster}
                           alt={`${movie.title} Poster`}
-                          style={{ width: '85px', height: '130px',margin:'10px' }}
+                          style={{ width: '75px', height: '110px'}}
                         />
                       </div>
-                      <div>
+                      <div className='review-list-main'>
                         <p>{movie.title}</p>
                         <p>{movie.review}</p>
                       </div>
@@ -92,4 +89,3 @@ const User = ({ params }) => {
 };
 
 export default User;
-

@@ -23,7 +23,6 @@ const auth = getAuth(app);
 const MovieDetailsPage = ({ params }) => {
   const [movie, setMovie] = useState(null);
   const [newMovieReview, setNewMovieReview] = useState('');
-  const [isEditMode, setIsEditMode] = useState(false);
   const [user, setUser] = useState(null);
   const [searchResults, setSearchResults] = useState({});
 
@@ -57,12 +56,12 @@ const MovieDetailsPage = ({ params }) => {
 
     fetchData().then(() => {
       console.log(searchResults);
-    }); // Call the async function inside useEffect
+    }); 
   }, [params.movieid]);
 
   useEffect(() => {
     if (user) {
-      const movieRef = ref(database, `users/${user.uid}/movies/${params.movieid}`);
+      const movieRef = ref(database, `users/${params.userid}/movies/${params.movieid}`);
 
       const handleData = (snapshot) => {
         if (snapshot.exists()) {
@@ -83,73 +82,47 @@ const MovieDetailsPage = ({ params }) => {
     }
   }, [params.movieid, database, user]);
 
-  const saveReview = () => {
-    if (user) {
-      if (newMovieReview.trim() !== '') {
-        const reviewsRef = ref(database, `users/${user.uid}/movies/${params.movieid}/review`);
-        set(reviewsRef, newMovieReview);
-        const movieRef = ref(database, `users/${user.uid}/movies/${params.movieid}`);
-        const newMovieData = {
-          title: searchResults.Title,
-          imdbID: searchResults.imdbID,
-          review: newMovieReview,
-        };
-        set(movieRef, newMovieData);
-
-        setIsEditMode(false);
-      } else {
-        alert('Please provide a non-empty review.');
-      }
-    }
-  };
-
   
 
   return (
-    <div>
-        <div>
+          <div className='movies-list-main'>
+          <div>
+            
+            <div className='flex-row'>
+          <div className='movie-review-img'>
+          <img
+          src={searchResults.Poster}
+          alt={`${searchResults.Title} Poster`}
+          style={{ width: '300px', height: '300px' }} 
+          />
+          <p>{searchResults.Title}</p>
+          <p>Runtime: {searchResults.Runtime}</p>
+          <p>IMDB: {searchResults.imdbRating}</p>
+          <p>Awards: {searchResults.Awards}</p>
+          </div>
+          <div className='movie-details'>
+          <p>Plot: {searchResults.Plot}</p>
+          <p>Director: {searchResults.Director}</p>
+          <p>Cast: {searchResults.Actors}</p>
+          <p>Genre: {searchResults.Genre}, Language: {searchResults.Language}, Country: {searchResults.Country}</p>
+          </div>
+
+
+          </div>
+
+          <div className='review-details'>
           
-          <div className='flex-row'>
-  <div className='movie-review-img' style={{ backgroundImage: `url(${searchResults.Poster})` }}>
-  </div>
-  <div className='movie-details'>
-  <h1 className='main-welcome'>{searchResults.Title}</h1>
-    <p>Released: {searchResults.Released}, Runtime: {searchResults.Runtime}</p>
-    
-    
-    <p>IMDB: {searchResults.imdbRating}</p>
-    <p>Awards: {searchResults.Awards}</p>
-    {isEditMode ? (
-            <div>
-              <textarea
-                value={newMovieReview}
-                onChange={(e) => setNewMovieReview(e.target.value)}
-                placeholder="Your Review"
-                style={{ color: 'black', width: '90%', minHeight: '100px', margin: '10px'}}
-              />
-              <button onClick={saveReview}>Save Review</button>
-            </div>
-          ) : (
-            <div>
-              <p>{newMovieReview}</p>
-              <button onClick={() => setIsEditMode(true)}><Link href={`/movie/${searchResults.imdbID}`}>Review This Movie</Link></button>
-            </div>
-          ) }
-  </div>
-  <div>
-  <p>Plot: {searchResults.Plot}</p>
-  <p>Director: {searchResults.Director}</p>
-    <p>Cast: {searchResults.Actors}</p>
-    <p>Genre: {searchResults.Genre}, Language: {searchResults.Language}, Country: {searchResults.Country}</p>
-  </div>
-</div>
+          <div>
+          <p>Review by {params.userid}</p>
+          <p>{newMovieReview}</p>
+          <button className='main-form-button'><Link href={`/movie/${searchResults.imdbID}`}>Review This Movie</Link></button>
+          </div>
+          
+          </div>
 
+          </div>
 
-    
-        
-        </div>
-      
-    </div>
+          </div>
   );
 };
 

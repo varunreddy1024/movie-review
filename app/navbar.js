@@ -1,7 +1,7 @@
 "use client"
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { getDatabase, ref, onValue, push, set } from 'firebase/database';
+import { getDatabase, ref, onValue, push, set, update } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
@@ -20,9 +20,8 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
 
-const MovieReviewPage = () => {
+const MovieFixed = () => {
   const [movies, setMovies] = useState([]);
-
   const [newMovieTitle, setNewMovieTitle] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,37 +29,8 @@ const MovieReviewPage = () => {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [editprofile, SetEditprofile] = useState(true);
-  const [searchResults, setSearchResults] = useState({});
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log('movies',movies)
-        if(movies.length>0){
-          let movieNewData={};
-          for(var i=0;i<movies.length; i++){
-            console.log('loading',i);
-            const response = await fetch(`https://omdbapi.com/?i=${movies[i].imdbID}&apikey=8643ded5`);
-            if (!response.ok) {
-              console.log(`HTTP error! Status: ${response.status}`);
-              continue;
-            }
-            let data = await response.json();
-            movieNewData[movies[i].imdbID]= data;
-            setSearchResults(movieNewData)
-          }
-        setSearchResults(movieNewData);
-        console.log('movie Data',movieNewData);
-        }else{
-          console.log('movie length less tahn 0')
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-fetchData();
-  }, [movies]);
   
 
   useEffect(() => {
@@ -81,13 +51,14 @@ fetchData();
     };
   
     onValue(reviewsRef, handleData);
-  }, [ user]);
-  useEffect(() => {  
+  
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
+  
       if (user) {
         const userReviewsRef = ref(database, `users/${user.uid}/movies`);
-
+        onValue(userReviewsRef, handleData);
+  
         const userRef = ref(database, `users/${user.uid}`);
         onValue(userRef, (snapshot) => {
           if (snapshot.exists()) {
@@ -102,9 +73,10 @@ fetchData();
     });
   
     return () => {
+      onValue(reviewsRef, handleData);
       unsubscribe();
     };
-  }, [ auth]);
+  }, [database, user]);
   
 
   const handleSignIn = () => {
@@ -144,35 +116,142 @@ fetchData();
       });
   };
 
-  console.log('intial movies',movies );
+  const handleSaveProfile = () => {
+    const user = auth.currentUser;
+  
+    if (user) {
+      const userRef = ref(database, `users/${user.uid}`);
+  
+      update(userRef, { name, age }) // Use update instead of set
+        .then(() => {
+          console.log('Profile updated successfully');
+          SetEditprofile(true);
+        })
+        .catch((error) => {
+          console.error('Error updating profile:', error.message);
+        });
+    } else {
+      alert('Please sign in to edit your profile.');
+    }
+  };
+  
+
+  const handleEditProfile = () => {
+    SetEditprofile(false);
+  };
+
   return (
+    
     <div>
       {user ? (
-        <div className='movies-list-main'>
+        <div>
+          <div className='main-heading'>
+            <h1 className='main-welcome'>Welcome, {user.email}!</h1>
+            <br />
 
-          <h2 className='color-red-bold'>Your Recent Reviews:</h2>
+            <br />
+            <div>
+              <Link href="/searchuser">
+                <p>Search Users</p>
+              </Link>
+              <br />
+              <Link href="/searchmovie">
+                <p>Search Movies</p>
+              </Link>
+            </div>
+          </div>
 
-          <ul>
-            {movies.map((movie) => (
-              <li key={movie.imdbID}>
-                <Link href={`/movie/${movie.imdbID}`}>
-                  <div className='review-main'>
-                    <div className='review-list-poster'>
-                      <img
-                        src={movie.poster}
-                        alt={`${movie.title} Poster`}
-                        style={{ width: '75px', height: '110px' }}
-                      />
-                    </div>
-                    <div className='review-list-main'>
-                      <p className='review-name'>{movie.title}</p>
-                      <p>Review: {movie.review.trim().slice(0,200)}{movie.review.length > 200 && '...'}</p>
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {editprofile ? (
+            <div className='position-left'>
+              <div className='main-profile'>
+                <div className='main-profile-item'>
+                  <span className='profile-main'>{name}</span>
+                </div>
+                <div className='main-profile-item'>
+                <p className='profile-main'>
+                  Faviorite Movies
+                </p>
+                </div>
+                <div className='main-profile-item'>
+                <p className='profile-main'>
+                    Notes
+                </p>
+                </div>
+                <div className='main-profile-item'>
+                <p className='profile-main'>
+                    Stories
+                </p>
+                </div>
+                <div className='main-profile-item'>
+                <p className='profile-main'>
+                    Watch List
+                </p>
+                </div>
+                <div className='main-profile-item'>
+                <p className='profile-main'>
+                    Notes
+                </p>
+                </div>
+                <div className='main-profile-item'>
+                <p className='profile-main'>
+                    Notes
+                </p>
+                </div>
+                <div className='main-profile-item'>
+                <p className='profile-main'>
+                    Notes
+                </p>
+                </div>
+                <div className='main-profile-item'>
+                <p className='profile-main'>
+                    Notes
+                </p>
+                </div>
+                
+             
+              </div>
+              <button
+                type="button"
+                onClick={handleEditProfile}
+                className='main-form-button'
+              >
+                Edit Profile
+              </button>
+              <button onClick={handleSignOut}
+              className='main-form-button'>Logout</button>
+             
+            </div>
+          ) : (
+            <div>
+              <div className='main-profile'>
+                <div>
+                  <label className='color-red'>Name:</label>
+                  <input
+                    type="text"
+                    className='form-input'
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className='color-red'>Age:</label>
+                  <input
+                    type="number"
+                    className='form-input'
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleSaveProfile}
+                className='main-form-button'
+              >
+                Save Profile
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <div>
@@ -210,4 +289,4 @@ fetchData();
   );
 };
 
-export default MovieReviewPage;
+export default MovieFixed;

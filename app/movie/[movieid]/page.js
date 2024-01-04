@@ -107,48 +107,55 @@ const MovieDetailsPage = ({ params }) => {
   
 
   return (
-    <div>
+    <div className='movies-list-main'>
         <div>
           
           <div className='flex-row'>
-  <div className='movie-review-img' style={{ backgroundImage: `url(${searchResults.Poster})` }}>
-  </div>
-  <div className='movie-details'>
-  <h1 className='main-welcome'>{searchResults.Title}</h1>
-    <p>Released: {searchResults.Released}, Runtime: {searchResults.Runtime}</p>
-    
-    
+  <div className='movie-review-img'>
+    <img
+      src={searchResults.Poster}
+      alt={`${searchResults.Title} Poster`}
+      style={{ width: '300px', height: '300px' }} 
+    />
+    <p>{searchResults.Title}</p>
+    <p>Runtime: {searchResults.Runtime}</p>
     <p>IMDB: {searchResults.imdbRating}</p>
     <p>Awards: {searchResults.Awards}</p>
-    {isEditMode ? (
-            <div>
-              <textarea
-                value={newMovieReview}
-                onChange={(e) => setNewMovieReview(e.target.value)}
-                placeholder="Your Review"
-                style={{ color: 'black', width: '90%', minHeight: '100px', margin: '10px'}}
-              />
-              <button onClick={saveReview}>Save Review</button>
-            </div>
-          ) : movie ? (
-            <div>
-              <p>{newMovieReview}</p>
-              <button onClick={() => setIsEditMode(true)}>Edit Review</button>
-            </div>
-          ) : (
-            <div>
-              <p>No review yet.</p>
-              <button onClick={() => setIsEditMode(true)}>Add Review</button>
-            </div>
-          )}
   </div>
-  <div>
-  <p>Plot: {searchResults.Plot}</p>
-  <p>Director: {searchResults.Director}</p>
+  <div className='movie-details'>
+    <p>Plot: {searchResults.Plot}</p>
+    <p>Director: {searchResults.Director}</p>
     <p>Cast: {searchResults.Actors}</p>
     <p>Genre: {searchResults.Genre}, Language: {searchResults.Language}, Country: {searchResults.Country}</p>
   </div>
+  
+ 
 </div>
+
+<div className='review-details'>
+    {isEditMode ? (
+      <div>
+        <textarea
+          value={newMovieReview}
+          onChange={(e) => setNewMovieReview(e.target.value)}
+          placeholder="Your Review"
+          style={{ color: 'black', width: '95%', minHeight: '300px', margin: '10px' }}
+        />
+        <button onClick={saveReview}>Save Review</button>
+      </div>
+    ) : movie ? (
+      <div>
+        <p>Review by {user.uid}</p>
+        <p>{newMovieReview}</p>
+        <button className='main-form-button' onClick={() => setIsEditMode(true)}>Edit Review</button>
+      </div>
+    ) : (
+      <div>
+        <p>No review yet.</p>
+        <button className='main-form-button' onClick={() => setIsEditMode(true)}>Add Review</button>
+      </div>
+    )}
+  </div>
 
 
     

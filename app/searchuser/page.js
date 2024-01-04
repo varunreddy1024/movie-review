@@ -65,8 +65,7 @@ const UserSearch = () => {
   };
 
   return (
-    <div>
-      <h2 className='main-welcome'>Search for other users</h2>
+    <div className='movies-list-main'>
       <form className='main-form'>
         <label className='color-red'>Name:</label>
         <input className='form-input'

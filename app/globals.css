@@ -50,17 +50,7 @@ li {
     font-size: 30px;
     margin-right: 10px;
     font-weight: bold;
-}
-
-a {
-    color: #007bff;
-    /* Set the desired color for the link */
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-    /* Optional: Add underline on hover */
+    margin: 10px;
 }
 
 button {
@@ -83,6 +73,7 @@ button {
     cursor: pointer;
     margin: 10px;
     border-radius: 10px;
+    display: block;
 }
 
 .main-welcome {
@@ -96,6 +87,13 @@ button {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+}
+
+.fixed-heading {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
 .main-form {
@@ -126,6 +124,7 @@ button {
 
 .main-profile {
     display: flex;
+    flex-direction: column;
     margin: 20px;
     color: #0c0c0c;
 }
@@ -136,12 +135,16 @@ button {
     font-weight: bolder;
 }
 
+.main-profile-item {
+    border: 1px solid #bd7272;
+    padding: 5px;
+}
+
 
 /* Assuming these class names are available in your stylesheets */
 
 .flex-row {
     display: flex;
-    align-items: center;
     justify-content: flex-start;
 }
 
@@ -152,18 +155,78 @@ button {
 }
 
 .movie-review-img {
-    width: 900px;
-    height: 400px;
+    width: 300px;
     background-size: cover;
     background-position: center;
     margin: 10px;
 }
 
 .movie-details {
+    width: 50%;
+    margin: 10px;
+}
+
+.review-details {
     margin: 10px;
 }
 
 .movie-details p {
     margin-bottom: 10px;
-    /* Adjust margin as needed */
+}
+
+.position-left {
+    position: fixed;
+    width: 20%;
+    background-color: #3f3a3a;
+    border: 2px solid #bd7272;
+}
+
+.movies-list-main {
+    width: 70%;
+    height: 80%;
+    max-width: 100%;
+    left: 25%;
+    position: fixed;
+    overflow: auto;
+    max-height: 80vh;
+    margin-top: 30px;
+    background-color: #333;
+    border: 2px solid #868585;
+}
+
+.movies-list-main::-webkit-scrollbar {
+    width: 12px;
+}
+
+.movies-list-main::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}
+
+.movies-list-main::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.review-main {
+    display: flex;
+    justify-content: flex-start;
+    padding: 10px;
+    border-bottom: 2px solid #bd2130;
+    margin: 10px;
+}
+
+.review-list-poster {
+    border: 1px solid #868585;
+}
+
+.review-list-main {
+    width: 80%;
+    height: 110px;
+    margin-left: 10px;
+}
+
+.review-name {
+    color: #a39d9d;
+    font-size: 20px;
+    margin-right: 10px;
+    font-weight: bold;
 }
