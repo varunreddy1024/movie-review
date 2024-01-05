@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react';
 import { getDatabase, ref, onValue, push, set, update } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
+import Card from '@mui/material/Card';
 const firebaseConfig = {
   apiKey: "AIzaSyD-u7omp9QnRMQtmb8QPvQZuz791p1StnY",
   authDomain: "t-clone-45bd0.firebaseapp.com",
@@ -30,6 +33,11 @@ const MovieFixed = () => {
   const [age, setAge] = useState('');
   const [editprofile, SetEditprofile] = useState(true);
 
+  const [view, setView] = useState("list");
+
+  const handleNavChange = (event, nextView) => {
+    setView(nextView);
+  };
 
   
 
@@ -147,31 +155,23 @@ const MovieFixed = () => {
         <div>
           <div className='main-heading'>
             <h1 className='main-welcome'>Welcome, {user.email}!</h1>
-            <br />
-
-            <br />
-            <div>
-              <Link href="/searchuser">
-                <p>Search Users</p>
-              </Link>
-              <br />
-              <Link href="/searchmovie">
-                <p>Search Movies</p>
-              </Link>
-            </div>
           </div>
 
           {editprofile ? (
-            <div className='position-left'>
-              <div className='main-profile'>
+            
+        <Card variant="outlined" className='position-left'>
+           
+              {/* <div className='main-profile'>
                 <div className='main-profile-item'>
                   <span className='profile-main'>{name}</span>
                 </div>
+                <Link href="/favlist">
                 <div className='main-profile-item'>
                 <p className='profile-main'>
                   Faviorite Movies
                 </p>
-                </div>
+                </div></Link>
+               
                 <div className='main-profile-item'>
                 <p className='profile-main'>
                     Notes
@@ -209,18 +209,72 @@ const MovieFixed = () => {
                 </div>
                 
              
-              </div>
-              <button
-                type="button"
-                onClick={handleEditProfile}
-                className='main-form-button'
-              >
-                Edit Profile
-              </button>
-              <button onClick={handleSignOut}
-              className='main-form-button'>Logout</button>
-             
-            </div>
+              </div> */}
+              <div >
+              <ToggleButtonGroup
+      orientation="vertical"
+      fullWidth
+      value={view}
+      exclusive
+      onChange={handleNavChange}
+    >
+      <ToggleButton value="list" aria-label="list">
+      <div>
+          <span>{name}</span>
+      </div>
+      </ToggleButton>
+      <ToggleButton value="module" aria-label="module">
+      <Link href="/favlist">
+          <div>
+                <p>
+                  Faviorite Movies
+                </p>
+                </div>
+                </Link>
+      </ToggleButton>
+      <ToggleButton value="module" aria-label="module">
+      <Link href="/watchlist">
+          <div>
+                <p>
+                  Watch List
+                </p>
+                </div>
+                </Link>
+      </ToggleButton>
+      <ToggleButton value="module" aria-label="module">
+      <Link href="/dairy">
+          <div>
+                <p>
+                  Dairy
+                </p>
+                </div>
+                </Link>
+      </ToggleButton>
+      <ToggleButton value="quilt" aria-label="quilt">
+      <Link href="/searchmovie">
+                <p>Search Movies</p>
+              </Link>
+      </ToggleButton>
+      <ToggleButton value="quilt" aria-label="quilt">
+      <Link href="/searchuser">
+                <p>Search Users</p>
+              </Link>
+      </ToggleButton>
+      <ToggleButton value="quilt" aria-label="quilt">
+                <p>
+                   About App
+                </p>
+      </ToggleButton>
+      <ToggleButton value="quilt" aria-label="quilt">
+      <p onClick={handleEditProfile}>Edit Profile</p>
+      </ToggleButton>
+      <ToggleButton value="quilt" aria-label="quilt">
+      <p onClick={handleSignOut}>Logout</p>
+      </ToggleButton>
+    </ToggleButtonGroup>
+                </div>
+           
+            </Card>
           ) : (
             <div>
               <div className='main-profile'>

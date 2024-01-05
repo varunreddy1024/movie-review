@@ -5,6 +5,9 @@ import { getDatabase, ref, onValue, set } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
+
+import Card from '@mui/material/Card';
+
 const firebaseConfig = {
   apiKey: "AIzaSyD-u7omp9QnRMQtmb8QPvQZuz791p1StnY",
   authDomain: "t-clone-45bd0.firebaseapp.com",
@@ -85,7 +88,7 @@ const MovieDetailsPage = ({ params }) => {
   
 
   return (
-          <div className='movies-list-main'>
+          <Card variant="outlined" className='movies-list-main'>
           <div>
             
             <div className='flex-row'>
@@ -122,7 +125,7 @@ const MovieDetailsPage = ({ params }) => {
 
           </div>
 
-          </div>
+          </Card>
   );
 };
 

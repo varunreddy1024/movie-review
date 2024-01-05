@@ -5,6 +5,8 @@ import { getDatabase, ref, onValue, push, set } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
+import Card from '@mui/material/Card';
+
 const firebaseConfig = {
   apiKey: "AIzaSyD-u7omp9QnRMQtmb8QPvQZuz791p1StnY",
   authDomain: "t-clone-45bd0.firebaseapp.com",
@@ -148,7 +150,7 @@ fetchData();
   return (
     <div>
       {user ? (
-        <div className='movies-list-main'>
+        <Card variant="outlined"  className='movies-list-main'>
 
           <h2 className='color-red-bold'>Your Recent Reviews:</h2>
 
@@ -173,38 +175,11 @@ fetchData();
               </li>
             ))}
           </ul>
-        </div>
+        </Card>
       ) : (
-        <div>
-          <h1 className='main-welcome'>Login</h1>
-          <form className='main-form'>
-            <div>
-              <label className='color-red'>Email:</label>
-              <input
-                type="email"
-                className='form-input'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className='color-red'>Password:</label>
-              <input
-                type="password"
-                className='form-input'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleSignIn}
-              className='main-form-button'
-            >
-              Sign In
-            </button>
-          </form>
-        </div>
+       <div>
+        <p>Login First</p>
+       </div>
       )}
     </div>
   );

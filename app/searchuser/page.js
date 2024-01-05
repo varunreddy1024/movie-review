@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { getDatabase, ref, get } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import Link from 'next/link';
+import TextField from '@mui/material/TextField';
+import Card from '@mui/material/Card';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-u7omp9QnRMQtmb8QPvQZuz791p1StnY",
@@ -24,8 +26,12 @@ const UserSearch = () => {
   const [searchedUserName, setSearchedUserName] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = async () => {
-    if (searchedUserName) {
+  const handleSearch = async (e) => {
+    setSearchedUserName(e.target.value);
+    const search = e.target.value.trim();
+    if(search ===''){
+      return false;
+    }
       try {
         const usersRef = ref(database, 'users');
         const snapshot = await get(usersRef);
@@ -59,27 +65,32 @@ const UserSearch = () => {
       } catch (error) {
         console.error('Error searching users:', error.message);
       }
-    } else {
-      alert('Please enter a user name to search.');
-    }
+    
   };
 
   return (
-    <div className='movies-list-main'>
+    <Card variant="outlined" className='movies-list-main'>
       <form className='main-form'>
-        <label className='color-red'>Name:</label>
-        <input className='form-input'
-          type="text"
-          value={searchedUserName}
-          onChange={(e) => setSearchedUserName(e.target.value)}
-        />
-        <button type="button" onClick={handleSearch} className='main-form-button'>
-          Search
-        </button>
+
+      <div style={{float:'right', 
+    display: 'flex',
+    flexDirection: 'row',
+    width: '95%',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    margin: 'auto',
+    marginTop: '5px'}}>  
+               <TextField
+        id="outlined-controlled"
+        label="Search"
+        value={searchedUserName}
+        onChange={handleSearch}
+        style={{float:'right'}}
+      /></div>
       </form>
 
       {searchResults.length > 0 ? (
-        <div>
+        <div className='margin-10px'>
           <h3>Search Results</h3>
            {searchResults.map((result) => (
             <div key={result.userId}>
@@ -96,7 +107,7 @@ const UserSearch = () => {
       ) : (
         <p>No user found.</p>
       )}
-    </div>
+    </Card>
   );
 };
 

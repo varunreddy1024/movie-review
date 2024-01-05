@@ -2,17 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-     :root {
-        --foreground-rgb: 255, 255, 255;
-        --background-start-rgb: 0, 0, 0;
-        --background-end-rgb: 0, 0, 0;
-    }
+    background-color: #272727;
 }
 
 body {
@@ -54,7 +44,6 @@ li {
 }
 
 button {
-    padding: 10px 15px;
     background-color: #dc3545;
     color: #fff;
     cursor: pointer;
@@ -71,13 +60,22 @@ button {
     color: #fff;
     border: 1px solid #dc3545;
     cursor: pointer;
-    margin: 10px;
     border-radius: 10px;
     display: block;
 }
 
+.mini-form-button {
+    padding: 3px 5px;
+    color: #fff;
+    border: 1px solid #dc3545;
+    cursor: pointer;
+    border-radius: 10px;
+    display: block;
+    margin-top: 2px;
+}
+
 .main-welcome {
-    color: #333;
+    color: #cecaca;
     font-size: 40px;
     font-weight: bolder;
 }
@@ -177,7 +175,6 @@ button {
 .position-left {
     position: fixed;
     width: 20%;
-    background-color: #3f3a3a;
     border: 2px solid #bd7272;
 }
 
@@ -187,11 +184,9 @@ button {
     max-width: 100%;
     left: 25%;
     position: fixed;
-    overflow: auto;
+    overflow: auto !important;
     max-height: 80vh;
     margin-top: 30px;
-    background-color: #333;
-    border: 2px solid #868585;
 }
 
 .movies-list-main::-webkit-scrollbar {
@@ -210,7 +205,7 @@ button {
     display: flex;
     justify-content: flex-start;
     padding: 10px;
-    border-bottom: 2px solid #bd2130;
+    border-bottom: 2px solid #4b5261;
     margin: 10px;
 }
 
@@ -225,8 +220,25 @@ button {
 }
 
 .review-name {
-    color: #a39d9d;
+    color: #6e86b6;
     font-size: 20px;
     margin-right: 10px;
     font-weight: bold;
+}
+
+.margin-10px {
+    margin: 10px;
+}
+
+.dairy-main {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 10px;
+    margin: 10px;
+}
+
+.dairy-item-main {
+    border-bottom: 2px solid #272727;
+    width: 900px;
 }

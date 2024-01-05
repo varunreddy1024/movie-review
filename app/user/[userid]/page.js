@@ -5,6 +5,8 @@ import { getDatabase, ref, onValue } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import Link from 'next/link';
 
+import Card from '@mui/material/Card';
+
 const firebaseConfig = {
   apiKey: "AIzaSyD-u7omp9QnRMQtmb8QPvQZuz791p1StnY",
   authDomain: "t-clone-45bd0.firebaseapp.com",
@@ -49,7 +51,7 @@ const User = ({ params }) => {
   }, [params.userid]);
 
   return (
-    <div className='movies-list-main'>
+    <Card variant="outlined" className='movies-list-main'>
       {userData ? (
         <div>
           <p>{userData.name}</p>
@@ -84,7 +86,7 @@ const User = ({ params }) => {
       ) : (
         <p>Loading...</p>
       )}
-    </div>
+    </Card>
   );
 };
 

@@ -1,43 +1,56 @@
 "use client"
 import React, { useState } from 'react';
 import Link from 'next/link';
+import TextField from '@mui/material/TextField';
+import Card from '@mui/material/Card';
 
 const MovieSearch = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
  
-    const handleSearch = async () => {
-        try {
-          const response = await fetch(
-            `https://omdbapi.com/?s=${searchTerm}&apikey=8643ded5`
-          );
-    
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-    
-          const data = await response.json();
-    
-          setSearchResults(data.Search || []);
-        } catch (error) {
-          console.error('Error fetching data:', error);
+    const handleSearch = async (e) => {
+      setSearchTerm(e.target.value);
+      const search = e.target.value.trim();
+      if(search ===''){
+          return false;
+      }
+      try {
+        const response = await fetch(
+          `https://omdbapi.com/?s=${search}&apikey=8643ded5`
+        );
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      };
+  
+        const data = await response.json();
+  
+        setSearchResults(data.Search || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
   return (
-    <div className='movies-list-main'>
+    <Card variant="outlined" className='movies-list-main'>
       <div className='main-form'>
-            <input
-              className='form-input'
-              type="text"
-              placeholder='Search Movie'
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button className='main-form-button' onClick={handleSearch}>
-              Search
-            </button>
+
+      <div style={{float:'right', 
+    display: 'flex',
+    flexDirection: 'row',
+    width: '95%',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    margin: 'auto',
+    marginTop: '5px'}}>  
+               <TextField
+        id="outlined-controlled"
+        label="Search"
+        value={searchTerm}
+        onChange={handleSearch}
+        style={{float:'right'}}
+      /></div>
           </div>
 
           <div>
@@ -66,7 +79,7 @@ const MovieSearch = ({ onSearch }) => {
   </ul>
 </div>
 
-    </div>
+    </Card>
   );
 };
 
