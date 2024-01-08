@@ -191,7 +191,7 @@ const Diary = () => {
    </ul>
    </div>
  </Card>):(
-  <h2>Login to <Access></Access></h2>
+  <h2>Login to Access</h2>
  )}
 
   </>
