@@ -190,7 +190,9 @@ const WatchSearch = ({ onSearch }) => {
   
 
   return (
-    <Card variant="outlined" className='movies-list-main'>
+
+   <>
+   {user?(<Card variant="outlined" className='movies-list-main'>
       <div className='main-form'>
         <div style={{
           float: 'right',
@@ -325,7 +327,14 @@ const WatchSearch = ({ onSearch }) => {
           </li>
         ))}
       </ul>
-    </Card>
+    </Card>):(
+      <h2>
+        Login To Acess
+      </h2>
+    )}
+   </>
+
+    
   );
 };
 

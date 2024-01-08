@@ -25,8 +25,8 @@ const auth = getAuth(app);
 
 const MovieFixed = () => {
   const [user, setUser] = useState(null);
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
+  const [name, setName] = useState(' ');
+  const [age, setAge] = useState(' ');
   const [editProfile, setEditProfile] = useState(true);
   const [favGenre, setFavGenre] = useState([]);
   const [favMovies, setFavMovies] = useState([]);
@@ -42,8 +42,8 @@ const MovieFixed = () => {
         onValue(userRef, (snapshot) => {
           if (snapshot.exists()) {
             const userData = snapshot.val();
-            setName(userData.name || '');
-            setAge(userData.age || '');
+            setName(userData.name || ' ');
+            setAge(userData.age || ' ');
             setFavGenre(userData.favGenre || []);
             setFavMovies(userData.favMovies || []);
             setFavDirectors(userData.favDirectors || []);

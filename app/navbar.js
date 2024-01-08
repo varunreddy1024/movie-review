@@ -126,6 +126,7 @@ const MovieFixed = () => {
   };
 
   const handleSignOut = () => {
+    setOpen(!open)
     signOut(auth)
       .then(() => {
         console.log('Signed out successfully');
@@ -146,30 +147,6 @@ const MovieFixed = () => {
         const errorMessage = error.message;
         console.error(`Error creating user: ${errorCode}`, errorMessage);
       });
-  };
-
-  const handleSaveProfile = () => {
-    const user = auth.currentUser;
-  
-    if (user) {
-      const userRef = ref(database, `users/${user.uid}`);
-  
-      update(userRef, { name, age }) // Use update instead of set
-        .then(() => {
-          console.log('Profile updated successfully');
-          SetEditprofile(true);
-        })
-        .catch((error) => {
-          console.error('Error updating profile:', error.message);
-        });
-    } else {
-      alert('Please sign in to edit your profile.');
-    }
-  };
-  
-
-  const handleEditProfile = () => {
-    SetEditprofile(false);
   };
 
   return (
@@ -250,7 +227,7 @@ const MovieFixed = () => {
               </Link>
             </ToggleButton>
             <ToggleButton value="quilt" aria-label="quilt">
-              <p onClick={handleSignOut}>Logout</p>
+              <p onClick={handleSignOut} >Logout</p>
             </ToggleButton>
           </ToggleButtonGroup>
         )}

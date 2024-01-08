@@ -10,6 +10,8 @@ import Card from '@mui/material/Card';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 
+  
+
 const firebaseConfig = {
   apiKey: "AIzaSyD-u7omp9QnRMQtmb8QPvQZuz791p1StnY",
   authDomain: "t-clone-45bd0.firebaseapp.com",
@@ -34,6 +36,7 @@ const Movieidea = () => {
   const [showForm, setShowForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editEntryId, setEditEntryId] = useState(null);
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -129,7 +132,9 @@ const Movieidea = () => {
   };
 
   return (
-    <Card variant="outlined" className='movies-list-main'>
+
+    <>
+    {user?(  <Card variant="outlined" className='movies-list-main'>
       {showForm ? (
         <>
           <div>
@@ -187,7 +192,12 @@ const Movieidea = () => {
         
       </ul>
       </div>
-    </Card>
+    </Card>):(<h2>
+        Login To Acess
+    </h2>)}
+    </>
+
+  
   );
 };
 

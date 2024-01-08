@@ -129,65 +129,73 @@ const Diary = () => {
   };
 
   return (
-    <Card variant="outlined" className='movies-list-main'>
-      {showForm ? (
-        <>
-          <div>
-            <TextField
-          sx={{ m: 2, width: '25ch' }}
-          id="standard-multiline-flexible"
-          label="Title"
-          multiline
-          maxRows={4}
-          variant="filled"
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-            />
-            <input style={{
-              margin: '20px',
-              height:'56px'}}
-              type="date"
-              value={customDate}
-              onChange={(e) => setCustomDate(e.target.value)}
-            />
-          </div>
-          <div>
-              <TextField sx={{ m: 2, width: '75ch' ,
-                          '@media (max-width: 600px)': {
-                            width: '30ch'  // Adjust padding for smaller screens
-                          }, }} variant="standard"
-          label="Write"
-          multiline
-          type="text"
-          value={entry}
-          onChange={(e) => setEntry(e.target.value)}
-            />
-          </div>
-          <Button sx={{ m: 2}} variant="outlined" onClick={handleSaveEntry}>{editMode ? 'Update Entry' : 'Save Entry'}</Button>
-        </>
-      ) : (
-        <Button sx={{ m: 2}}  variant="outlined" onClick={() => setShowForm(true)}>{editMode ? 'Edit Entry' : 'Write Diary'}</Button>
-      )}
+    
+  <>
 
-      <h2 style={{
-    margin: '20px'}}>Your Diary Entries</h2>
-      <div className='dairy-main'>
-      <ul>
-        {dairyEntries.map((entry) => (
-            <div className='dairy-item-main'>
-          <li key={entry.id}>
-            <strong>{entry.title}</strong> - {entry.customDate}
-            <p>{entry.entry}</p>
-            <Button sx={{ m: 1}} variant="outlined" size="medium" onClick={() => handleEditEntry(entry.id)}>Edit</Button>
-            <Button sx={{ m: 1 }} variant="outlined" startIcon={<DeleteIcon />} onClick={() => handleDeleteEntry(entry.id)}>Delete</Button>
-          </li>
-          </div>
-        ))}
-        
-      </ul>
-      </div>
-    </Card>
+   {user?( <Card variant="outlined" className='movies-list-main'>
+   {showForm ? (
+     <>
+       <div>
+         <TextField
+       sx={{ m: 2, width: '25ch' }}
+       id="standard-multiline-flexible"
+       label="Title"
+       multiline
+       maxRows={4}
+       variant="filled"
+       type="text"
+       value={title}
+       onChange={(e) => setTitle(e.target.value)}
+         />
+         <input style={{
+           margin: '20px',
+           height:'56px'}}
+           type="date"
+           value={customDate}
+           onChange={(e) => setCustomDate(e.target.value)}
+         />
+       </div>
+       <div>
+           <TextField sx={{ m: 2, width: '75ch' ,
+                       '@media (max-width: 600px)': {
+                         width: '30ch'  // Adjust padding for smaller screens
+                       }, }} variant="standard"
+       label="Write"
+       multiline
+       type="text"
+       value={entry}
+       onChange={(e) => setEntry(e.target.value)}
+         />
+       </div>
+       <Button sx={{ m: 2}} variant="outlined" onClick={handleSaveEntry}>{editMode ? 'Update Entry' : 'Save Entry'}</Button>
+     </>
+   ) : (
+     <Button sx={{ m: 2}}  variant="outlined" onClick={() => setShowForm(true)}>{editMode ? 'Edit Entry' : 'Write Diary'}</Button>
+   )}
+
+   <h2 style={{
+ margin: '20px'}}>Your Diary Entries</h2>
+   <div className='dairy-main'>
+   <ul>
+     {dairyEntries.map((entry) => (
+         <div className='dairy-item-main'>
+       <li key={entry.id}>
+         <strong>{entry.title}</strong> - {entry.customDate}
+         <p>{entry.entry}</p>
+         <Button sx={{ m: 1}} variant="outlined" size="medium" onClick={() => handleEditEntry(entry.id)}>Edit</Button>
+         <Button sx={{ m: 1 }} variant="outlined" startIcon={<DeleteIcon />} onClick={() => handleDeleteEntry(entry.id)}>Delete</Button>
+       </li>
+       </div>
+     ))}
+     
+   </ul>
+   </div>
+ </Card>):(
+  <h2>Login to <Access></Access></h2>
+ )}
+
+  </>
+   
   );
 };
 
