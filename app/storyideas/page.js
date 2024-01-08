@@ -25,12 +25,12 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
 
-const Diary = () => {
+const Movieidea = () => {
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState('');
   const [entry, setEntry] = useState('');
   const [customDate, setCustomDate] = useState('');
-  const [dairyEntries, setDairyEntries] = useState([]);
+  const [storyideasEntries, setstoryideasEntries] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editEntryId, setEditEntryId] = useState(null);
@@ -47,43 +47,43 @@ const Diary = () => {
 
   useEffect(() => {
     if (user) {
-      const dairyRef = ref(database, `users/${user.uid}/dairy`);
+      const storyideasRef = ref(database, `users/${user.uid}/storyideas`);
 
       const handleData = (snapshot) => {
         if (snapshot.exists()) {
-          const dairyData = snapshot.val();
-          const dairyList = Object.keys(dairyData).map((key) => ({
+          const storyideasData = snapshot.val();
+          const storyideasList = Object.keys(storyideasData).map((key) => ({
             id: key,
-            ...dairyData[key],
+            ...storyideasData[key],
           }));
-          setDairyEntries(dairyList);
+          setstoryideasEntries(storyideasList);
         } else {
-          setDairyEntries([]);
+          setstoryideasEntries([]);
         }
       };
 
-      const unsubscribeDairy = onValue(dairyRef, handleData);
+      const unsubscribestoryideas = onValue(storyideasRef, handleData);
 
       return () => {
-        unsubscribeDairy();
+        unsubscribestoryideas();
       };
     }
   }, [user, database, showForm, editMode]);
 
   const handleSaveEntry = () => {
     if (!title.trim()) {
-      alert('Logline cannot be empty. Please provide a logline.');
-      return;
-    }
+        alert('Logline cannot be empty. Please provide a logline.');
+        return;
+      }
     if (user) {
-        const dairyRef = editEntryId
-        ? ref(database, `users/${user.uid}/dairy/${editEntryId}`)
-        : ref(database, `users/${user.uid}/dairy`);
+        const storyideasRef = editEntryId
+        ? ref(database, `users/${user.uid}/storyideas/${editEntryId}`)
+        : ref(database, `users/${user.uid}/storyideas`);
       
 
       if (editMode && editEntryId) {
         // Update the existing entry
-        update(dairyRef, {
+        update(storyideasRef, {
           title,
           entry,
           customDate,
@@ -92,7 +92,7 @@ const Diary = () => {
         setEditEntryId(null);
       } else {
         // Push the new entry to the database
-        push(dairyRef, {
+        push(storyideasRef, {
           title,
           entry,
           customDate,
@@ -108,7 +108,7 @@ const Diary = () => {
   };
 
   const handleEditEntry = (entryId) => {
-    const entryToEdit = dairyEntries.find((entry) => entry.id === entryId);
+    const entryToEdit = storyideasEntries.find((entry) => entry.id === entryId);
     if (entryToEdit) {
       setTitle(entryToEdit.title);
       setEntry(entryToEdit.entry);
@@ -121,10 +121,10 @@ const Diary = () => {
 
   const handleDeleteEntry = (entryId) => {
     if (user) {
-      const dairyRef = ref(database, `users/${user.uid}/dairy/${entryId}`);
+      const storyideasRef = ref(database, `users/${user.uid}/storyideas/${entryId}`);
   
       // Remove the entry from the database
-      remove(dairyRef);
+      remove(storyideasRef);
     }
   };
 
@@ -134,9 +134,9 @@ const Diary = () => {
         <>
           <div>
             <TextField
-          sx={{ m: 2, width: '25ch' }}
+          sx={{ m: 2, width: '30ch' }}
           id="standard-multiline-flexible"
-          label="Title"
+          label="LogLine"
           multiline
           maxRows={4}
           variant="filled"
@@ -155,7 +155,7 @@ const Diary = () => {
           <div>
               <TextField sx={{ m: 2, width: '75ch' ,
                           '@media (max-width: 600px)': {
-                            width: '30ch'  // Adjust padding for smaller screens
+                            width: '30ch'
                           }, }} variant="standard"
           label="Write"
           multiline
@@ -164,17 +164,17 @@ const Diary = () => {
           onChange={(e) => setEntry(e.target.value)}
             />
           </div>
-          <Button sx={{ m: 2}} variant="outlined" onClick={handleSaveEntry}>{editMode ? 'Update Entry' : 'Save Entry'}</Button>
+          <Button sx={{ m: 2}} variant="outlined" onClick={handleSaveEntry}>{editMode ? 'Update Idea' : 'Save Idea'}</Button>
         </>
       ) : (
-        <Button sx={{ m: 2}}  variant="outlined" onClick={() => setShowForm(true)}>{editMode ? 'Edit Entry' : 'Write Diary'}</Button>
+        <Button sx={{ m: 2}}  variant="outlined" onClick={() => setShowForm(true)}>{editMode ? 'Edit Entry' : 'New Idea'}</Button>
       )}
 
       <h2 style={{
-    margin: '20px'}}>Your Diary Entries</h2>
-      <div className='dairy-main'>
+    margin: '20px'}}>Your Story Entries</h2>
+      <div className='storyideas-main'>
       <ul>
-        {dairyEntries.map((entry) => (
+        {storyideasEntries.map((entry) => (
             <div className='dairy-item-main'>
           <li key={entry.id}>
             <strong>{entry.title}</strong> - {entry.customDate}
@@ -191,4 +191,4 @@ const Diary = () => {
   );
 };
 
-export default Diary;
+export default Movieidea;

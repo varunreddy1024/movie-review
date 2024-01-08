@@ -7,6 +7,9 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 
 import Card from '@mui/material/Card';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { Margin } from '@mui/icons-material';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-u7omp9QnRMQtmb8QPvQZuz791p1StnY",
@@ -28,6 +31,7 @@ const MovieDetailsPage = ({ params }) => {
   const [newMovieReview, setNewMovieReview] = useState('');
   const [user, setUser] = useState(null);
   const [searchResults, setSearchResults] = useState({});
+  const [recentReviews, setRecentReviews] = useState([]);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -43,7 +47,7 @@ const MovieDetailsPage = ({ params }) => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://omdbapi.com/?i=${params.movieid}&apikey=8643ded5&plot=full`
+          `https://omdbapi.com/?i=${params.movieid}&apikey=8643ded5`
         );
 
         if (!response.ok) {
@@ -85,11 +89,51 @@ const MovieDetailsPage = ({ params }) => {
     }
   }, [params.movieid, database, user]);
 
+  useEffect(() => {
+    const fetchRecentReviews = async () => {
+      try {
+        const moviesReviewsRef = ref(database, `movies/${params.movieid}`);
+        const snapshot = await get(moviesReviewsRef);
+  
+        if (snapshot.exists()) {
+          const reviewsData = snapshot.val();
+          setRecentReviews(reviewsData || {}); // Ensure reviewsData is an object
+        } else {
+          setRecentReviews({});
+        }
+      } catch (error) {
+        console.error('Error fetching recent reviews:', error);
+      }
+    };
+  
+    fetchRecentReviews();
+  }, [params.movieid, database]);
+
   
 
   return (
+
+    <>
+      {user ? (
+    
           <Card variant="outlined" className='movies-list-main'>
           <div>
+          <b className='movie-title'>{searchResults.Title}</b>
+          <div>
+          <TextField sx={{ m: 2, width: '80ch'}} variant="standard"
+              id="outlined-read-only-input"
+              label={"Review by You" + params.userid}
+              value={newMovieReview}
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          <Button sx={{ m: 1,
+                          '@media (max-width: 600px)': {
+                              fontSize: '10px', 
+                              padding: '3px 5px', 
+                          }, }} variant="contained"><Link href={`/movie/${searchResults.imdbID}`}>Review This Movie</Link></Button>
+          </div>
             
             <div className='flex-row'>
           <div className='movie-review-img'>
@@ -98,16 +142,13 @@ const MovieDetailsPage = ({ params }) => {
           alt={`${searchResults.Title} Poster`}
           style={{ width: '300px', height: '300px' }} 
           />
-          <p>{searchResults.Title}</p>
-          <p>Runtime: {searchResults.Runtime}</p>
-          <p>IMDB: {searchResults.imdbRating}</p>
-          <p>Awards: {searchResults.Awards}</p>
           </div>
           <div className='movie-details'>
           <p>Plot: {searchResults.Plot}</p>
           <p>Director: {searchResults.Director}</p>
           <p>Cast: {searchResults.Actors}</p>
-          <p>Genre: {searchResults.Genre}, Language: {searchResults.Language}, Country: {searchResults.Country}</p>
+          <p>Runtime: {searchResults.Runtime}</p>
+          <p>IMDB: {searchResults.imdbRating}</p>
           </div>
 
 
@@ -115,17 +156,18 @@ const MovieDetailsPage = ({ params }) => {
 
           <div className='review-details'>
           
-          <div>
-          <p>Review by {params.userid}</p>
-          <p>{newMovieReview}</p>
-          <button className='main-form-button'><Link href={`/movie/${searchResults.imdbID}`}>Review This Movie</Link></button>
-          </div>
+          
           
           </div>
 
           </div>
 
-          </Card>
+          </Card>):
+
+(
+  <h1>Login To Access</h1>
+)}
+</>
   );
 };
 

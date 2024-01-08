@@ -1,11 +1,15 @@
 "use client"
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 import { getDatabase, ref, onValue, push, set, update } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
+import Button from '@mui/material/Button';
 
 import Card from '@mui/material/Card';
 const firebaseConfig = {
@@ -32,14 +36,33 @@ const MovieFixed = () => {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [editprofile, SetEditprofile] = useState(true);
+  const [view, setView] = useState('list');
+  const [isWideScreen, setIsWideScreen] = useState(true);
+  const [open, setOpen] = useState(false);
 
-  const [view, setView] = useState("list");
+  useEffect(() => {
+    const handleResize = () => {
+      setIsWideScreen(window.innerWidth > 768); // Adjust the breakpoint as needed
+    };
 
-  const handleNavChange = (event, nextView) => {
-    setView(nextView);
+    // Initial check on mount
+    handleResize();
+
+    // Listen for window resize events
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const handleNavChange = (event, newView) => {
+    if (newView !== null) {
+      setView(newView);
+    }
   };
 
-  
 
   useEffect(() => {
     const reviewsRef = ref(database, `users/${user?.uid}/movies`);
@@ -62,6 +85,7 @@ const MovieFixed = () => {
   
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
+
   
       if (user) {
         const userReviewsRef = ref(database, `users/${user.uid}/movies`);
@@ -84,7 +108,7 @@ const MovieFixed = () => {
       onValue(reviewsRef, handleData);
       unsubscribe();
     };
-  }, [database, user]);
+  }, [database, user,auth]);
   
 
   const handleSignIn = () => {
@@ -154,162 +178,88 @@ const MovieFixed = () => {
       {user ? (
         <div>
           <div className='main-heading'>
-            <h1 className='main-welcome'>Welcome, {user.email}!</h1>
+            <h1 className='main-welcome'><span>Mo</span><span style={{ color: 'red' }}>view</span></h1>
+            {!isWideScreen && (
+           <IconButton
+           color="inherit"
+           edge="start"
+           onClick={() => setOpen(!open)}
+           sx={{display: { xs: 'block', sm: 'none' } }}
+         >
+           {open ? <CloseIcon style={{ color: 'red' }} /> : <MenuIcon style={{ color: '#2e7ad1' }}/>}
+         </IconButton>
+        )}
           </div>
-
-          {editprofile ? (
+ 
             
-        <Card variant="outlined" className='position-left'>
-           
-              {/* <div className='main-profile'>
-                <div className='main-profile-item'>
-                  <span className='profile-main'>{name}</span>
-                </div>
-                <Link href="/favlist">
-                <div className='main-profile-item'>
-                <p className='profile-main'>
-                  Faviorite Movies
-                </p>
-                </div></Link>
-               
-                <div className='main-profile-item'>
-                <p className='profile-main'>
-                    Notes
-                </p>
-                </div>
-                <div className='main-profile-item'>
-                <p className='profile-main'>
-                    Stories
-                </p>
-                </div>
-                <div className='main-profile-item'>
-                <p className='profile-main'>
-                    Watch List
-                </p>
-                </div>
-                <div className='main-profile-item'>
-                <p className='profile-main'>
-                    Notes
-                </p>
-                </div>
-                <div className='main-profile-item'>
-                <p className='profile-main'>
-                    Notes
-                </p>
-                </div>
-                <div className='main-profile-item'>
-                <p className='profile-main'>
-                    Notes
-                </p>
-                </div>
-                <div className='main-profile-item'>
-                <p className='profile-main'>
-                    Notes
-                </p>
-                </div>
-                
-             
-              </div> */}
-              <div >
-              <ToggleButtonGroup
-      orientation="vertical"
-      fullWidth
-      value={view}
-      exclusive
-      onChange={handleNavChange}
-    >
-      <ToggleButton value="list" aria-label="list">
+          <Card variant="outlined" className={`position-left${isWideScreen ? '' : ' open'}`}>
       <div>
-          <span>{name}</span>
+
+        {/* Use conditional rendering based on screen width */}
+        {(isWideScreen || open) && (
+          <ToggleButtonGroup
+            orientation="vertical"
+            fullWidth
+            value={view}
+            exclusive
+            onChange={handleNavChange}
+          >
+            <ToggleButton value="list" aria-label="list">
+              <Link href="/">
+                <p onClick={() => setOpen(!open)}>Your Profile</p>
+              </Link>
+            </ToggleButton>
+            <ToggleButton value="module" aria-label="module">
+              <Link href="/favlist">
+                <p onClick={() => setOpen(!open)}>Favorite Movies</p>
+              </Link>
+            </ToggleButton>
+            <ToggleButton value="module" aria-label="module">
+              <Link href="/watchlist">
+                <p onClick={() => setOpen(!open)}>Watch List</p>
+              </Link>
+            </ToggleButton>
+            <ToggleButton value="module" aria-label="module">
+              <Link href="/dairy">
+                <p onClick={() => setOpen(!open)}>Dairy</p>
+              </Link>
+            </ToggleButton>
+            <ToggleButton value="quilt" aria-label="quilt">
+            <Link href="/storyideas">
+              <p onClick={() => setOpen(!open)}>Story Ideas</p>
+              </Link>
+            </ToggleButton>
+            <ToggleButton value="quilt" aria-label="quilt">
+              <Link href="/movielist">
+                <p onClick={() => setOpen(!open)}>Your Reviews</p>
+              </Link>
+            </ToggleButton>
+            <ToggleButton value="quilt" aria-label="quilt">
+              <Link href="/searchmovie">
+                <p onClick={() => setOpen(!open)}>Search Movies</p>
+              </Link>
+            </ToggleButton>
+            <ToggleButton value="quilt" aria-label="quilt">
+              <Link href="/searchuser">
+                <p onClick={() => setOpen(!open)}>Search Users</p>
+              </Link>
+            </ToggleButton>
+            <ToggleButton value="quilt" aria-label="quilt">
+            <Link href="/about">
+              <p onClick={() => setOpen(!open)}>About App</p>
+              </Link>
+            </ToggleButton>
+            <ToggleButton value="quilt" aria-label="quilt">
+              <p onClick={handleSignOut}>Logout</p>
+            </ToggleButton>
+          </ToggleButtonGroup>
+        )}
       </div>
-      </ToggleButton>
-      <ToggleButton value="module" aria-label="module">
-      <Link href="/favlist">
-          <div>
-                <p>
-                  Faviorite Movies
-                </p>
-                </div>
-                </Link>
-      </ToggleButton>
-      <ToggleButton value="module" aria-label="module">
-      <Link href="/watchlist">
-          <div>
-                <p>
-                  Watch List
-                </p>
-                </div>
-                </Link>
-      </ToggleButton>
-      <ToggleButton value="module" aria-label="module">
-      <Link href="/dairy">
-          <div>
-                <p>
-                  Dairy
-                </p>
-                </div>
-                </Link>
-      </ToggleButton>
-      <ToggleButton value="quilt" aria-label="quilt">
-      <Link href="/searchmovie">
-                <p>Search Movies</p>
-              </Link>
-      </ToggleButton>
-      <ToggleButton value="quilt" aria-label="quilt">
-      <Link href="/searchuser">
-                <p>Search Users</p>
-              </Link>
-      </ToggleButton>
-      <ToggleButton value="quilt" aria-label="quilt">
-                <p>
-                   About App
-                </p>
-      </ToggleButton>
-      <ToggleButton value="quilt" aria-label="quilt">
-      <p onClick={handleEditProfile}>Edit Profile</p>
-      </ToggleButton>
-      <ToggleButton value="quilt" aria-label="quilt">
-      <p onClick={handleSignOut}>Logout</p>
-      </ToggleButton>
-    </ToggleButtonGroup>
-                </div>
-           
-            </Card>
-          ) : (
-            <div>
-              <div className='main-profile'>
-                <div>
-                  <label className='color-red'>Name:</label>
-                  <input
-                    type="text"
-                    className='form-input'
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className='color-red'>Age:</label>
-                  <input
-                    type="number"
-                    className='form-input'
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                  />
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleSaveProfile}
-                className='main-form-button'
-              >
-                Save Profile
-              </button>
-            </div>
-          )}
+    </Card>
         </div>
       ) : (
         <div>
-          <h1 className='main-welcome'>Login</h1>
+          <h1 className='main-welcome'>MovieW</h1>
           <form className='main-form'>
             <div>
               <label className='color-red'>Email:</label>
@@ -329,13 +279,16 @@ const MovieFixed = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <button
+            <Link href="/" >
+            <Button sx={{ m: 2}} 
+           variant="contained"
               type="button"
               onClick={handleSignIn}
-              className='main-form-button'
             >
               Sign In
-            </button>
+            </Button>
+            </Link>
+            
           </form>
         </div>
       )}

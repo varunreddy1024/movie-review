@@ -1,11 +1,19 @@
-"use client"
 // UserSearch.js
+"use client"
 import { useState, useEffect } from 'react';
-import { getDatabase, ref, get } from 'firebase/database';
-import { initializeApp } from 'firebase/app';
 import Link from 'next/link';
 import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set,
+  push,
+  get
+} from 'firebase/database';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-u7omp9QnRMQtmb8QPvQZuz791p1StnY",
@@ -20,94 +28,114 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
-
+const auth = getAuth(app);
 
 const UserSearch = () => {
   const [searchedUserName, setSearchedUserName] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user, auth]);
 
   const handleSearch = async (e) => {
     setSearchedUserName(e.target.value);
     const search = e.target.value.trim();
-    if(search ===''){
+
+    if (search === '') {
       return false;
     }
-      try {
-        const usersRef = ref(database, 'users');
-        const snapshot = await get(usersRef);
 
-        if (snapshot.exists()) {
-          const userData = snapshot.val();
-          const results = [];
+    try {
+      const usersRef = ref(database, 'users');
+      const snapshot = await get(usersRef);
 
-          if (userData) {
-            // Iterate over user nodes
-            Object.keys(userData).forEach((userId) => {
-              const user = userData[userId];
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        const results = [];
 
-              // Check if the user's name contains the search term
-              if (user && user.name && user.name.toLowerCase().includes(searchedUserName.toLowerCase())) {
-                results.push({
-                  userId,
-                  name: user.name,
-                  age: user.age || 'N/A',
-                  movies: user.movies || [], // Assuming movies is an array
-                });
-              }
-            });
-          }
+        if (userData) {
+          // Iterate over user nodes
+          Object.keys(userData).forEach((userId) => {
+            const user = userData[userId];
 
-          setSearchResults(results);
-          console.log(results);
-        } else {
-          setSearchResults([]);
+            // Check if the user's name contains the search term
+            if (user && user.name && user.name.toLowerCase().includes(searchedUserName.toLowerCase())) {
+              results.push({
+                userId,
+                name: user.name,
+                age: user.age || 'N/A',
+                movies: user.movies || [], // Assuming movies is an array
+              });
+            }
+          });
         }
-      } catch (error) {
-        console.error('Error searching users:', error.message);
+
+        setSearchResults(results);
+        console.log(results);
+      } else {
+        setSearchResults([]);
       }
-    
+    } catch (error) {
+      console.error('Error searching users:', error.message);
+    }
   };
 
   return (
-    <Card variant="outlined" className='movies-list-main'>
-      <form className='main-form'>
-
-      <div style={{float:'right', 
-    display: 'flex',
-    flexDirection: 'row',
-    width: '95%',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    margin: 'auto',
-    marginTop: '5px'}}>  
-               <TextField
-        id="outlined-controlled"
-        label="Search"
-        value={searchedUserName}
-        onChange={handleSearch}
-        style={{float:'right'}}
-      /></div>
-      </form>
-
-      {searchResults.length > 0 ? (
-        <div className='margin-10px'>
-          <h3>Search Results</h3>
-           {searchResults.map((result) => (
-            <div key={result.userId}>
-              <Link href={`/user/${result.userId}`}>
-                <div>
-                  <p>{result.name}</p>
-                </div>
-              </Link>
-              <p>{result.age}</p>
-              <hr />
+    <>
+      {user ? (
+        <Card variant="outlined" className='movies-list-main'>
+          <form className='main-form'>
+            <div style={{
+              float: 'right',
+              display: 'flex',
+              flexDirection: 'row',
+              width: '95%',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              margin: 'auto',
+              marginTop: '5px'
+            }}>
+              <TextField
+                id="outlined-controlled"
+                label="Search"
+                value={searchedUserName}
+                onChange={handleSearch}
+                style={{ float: 'right' }}
+              />
             </div>
-          ))}
-        </div>
+          </form>
+
+          {searchResults.length > 0 ? (
+            <div className='margin-10px'>
+              <h3>Search Results</h3>
+              {searchResults.map((result) => (
+                <div key={result.userId}>
+                  <Link href={`/user/${result.userId}`}>
+                    <div>
+                      <p>{result.name}</p>
+                    </div>
+                  </Link>
+                  <p>{result.age}</p>
+                  <hr />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No user found.</p>
+          )}
+        </Card>
       ) : (
-        <p>No user found.</p>
+        <h1>Login To Access</h1>
       )}
-    </Card>
+    </>
   );
 };
 

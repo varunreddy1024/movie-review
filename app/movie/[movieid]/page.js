@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { getDatabase, ref, onValue, set, get } from 'firebase/database';
+import { getDatabase, ref, onValue, set, get,push } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-
+import Link from 'next/link';
 
 import Card from '@mui/material/Card';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-u7omp9QnRMQtmb8QPvQZuz791p1StnY",
@@ -29,6 +31,9 @@ const MovieDetailsPage = ({ params }) => {
   const [user, setUser] = useState(null);
   const [searchResults, setSearchResults] = useState({});
   const [recentReviews, setRecentReviews] = useState([]);
+  const [favorites, setFavorites] = useState(new Set());
+  const [watchlist, setWatchlist] = useState(new Set());
+  
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -44,7 +49,7 @@ const MovieDetailsPage = ({ params }) => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://omdbapi.com/?i=${params.movieid}&apikey=8643ded5&plot=full`
+          `https://omdbapi.com/?i=${params.movieid}&apikey=8643ded5`
         );
 
         if (!response.ok) {
@@ -134,6 +139,29 @@ const MovieDetailsPage = ({ params }) => {
     }
   };
 
+
+  const addToWatchlist = (movie) => {
+    if (user) {
+      // Check if the movie is already in watchlist
+      if (!watchlist.has(movie.imdbID)) {
+        // Update the Firebase watchlist with only the imdbID
+        push(ref(database, `users/${user.uid}/watchlist`), movie.imdbID);
+        setWatchlist(new Set(watchlist).add(movie.imdbID));
+      }
+    }
+  };
+
+  const addToFavorites = (movie) => {
+    if (user) {
+      // Check if the movie is already in favorites
+      if (!favorites.has(movie.imdbID)) {
+        // Update the Firebase favorites list with only the imdbID
+        push(ref(database, `users/${user.uid}/favorites`), movie.imdbID);
+        setFavorites(new Set(favorites).add(movie.imdbID));
+      }
+    }
+  };
+
   return (
     <Card variant="outlined" className='movies-list-main'>
       <div>
@@ -144,56 +172,130 @@ const MovieDetailsPage = ({ params }) => {
               alt={`${searchResults.Title} Poster`}
               style={{ width: '300px', height: '300px' }}
             />
-            <p>{searchResults.Title}</p>
-            <p>Runtime: {searchResults.Runtime}</p>
-            <p>IMDB: {searchResults.imdbRating}</p>
-            <p>Awards: {searchResults.Awards}</p>
+           
           </div>
           <div className='movie-details'>
-            <p>Plot: {searchResults.Plot}</p>
-            <p>Director: {searchResults.Director}</p>
-            <p>Cast: {searchResults.Actors}</p>
-            <p>
-              Genre: {searchResults.Genre}, Language: {searchResults.Language}, Country: {searchResults.Country}
-            </p>
+            <h2><b>{searchResults.Title}</b></h2>
+            <p><b>Plot: </b>{searchResults.Plot}</p>
+            <p><b>Director: </b>{searchResults.Director}</p>
+            <p><b>Cast: </b>{searchResults.Actors}</p>
+            <p><b>Runtime: </b>{searchResults.Runtime}</p>
+            <p><b>IMDB: </b>{searchResults.imdbRating}</p>
           </div>
         </div>
 
-        <div className='review-details'>
+        <div>
           {isEditMode ? (
+            <>
             <div>
-              <textarea
+              <TextField sx={{ m: 2, width: '80ch',
+                          '@media (max-width: 600px)': {
+                              width:'30ch' // Adjust padding for smaller screens
+                          }, }} variant="standard"
+                label="Edit Your Review"
+                multiline
+                type="text"
                 value={newMovieReview}
                 onChange={(e) => setNewMovieReview(e.target.value)}
                 placeholder="Your Review"
-                style={{ color: 'black', width: '95%', minHeight: '300px', margin: '10px' }}
               />
-              <button onClick={saveReview}>Save Review</button>
+              
             </div>
+            <Button sx={{ m: 1,
+                          '@media (max-width: 600px)': {
+                              fontSize: '10px', // Adjust the font size for smaller screens
+                              padding: '3px 5px', // Adjust padding for smaller screens
+                          }, }} variant="contained"  onClick={saveReview}>Save Review</Button>
+            </>
           ) : movie ? (
             <div>
-              <p>Review by {user.uid}</p>
-              <p>{newMovieReview}</p>
-              <button className='main-form-button' onClick={() => setIsEditMode(true)}>
-                Edit Review
-              </button>
-            </div>
+
+            <TextField sx={{ m: 2,width: '80ch',
+                          '@media (max-width: 600px)': {
+                              width:'30ch' // Adjust padding for smaller screens
+                          }, }}  variant="standard"
+              id="outlined-read-only-input"
+              label={"Review by You"}
+              defaultValue={newMovieReview}
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+            <Button sx={{ m: 1,
+                          '@media (max-width: 600px)': {
+                              fontSize: '10px', // Adjust the font size for smaller screens
+                              padding: '3px 5px', // Adjust padding for smaller screens
+                          }, }} variant="contained"  onClick={() => setIsEditMode(true)}>
+            Edit Review
+            </Button>
+                  <Button sx={{ m: 1,
+                          '@media (max-width: 600px)': {
+                              fontSize: '10px', // Adjust the font size for smaller screens
+                              padding: '3px 5px', // Adjust padding for smaller screens
+                          }, }}variant="contained"
+                    onClick={() => addToFavorites(searchResults)}
+                  >
+                    Add to Fav
+                  </Button>
+                  <Button sx={{ m: 1,
+                          '@media (max-width: 600px)': {
+                              fontSize: '10px', // Adjust the font size for smaller screens
+                              padding: '3px 5px', // Adjust padding for smaller screens
+                          }, }} variant="contained"
+                    onClick={() => addToWatchlist(searchResults)}
+                  >
+                    Add to Wlist
+                  </Button>
+                  </div>
           ) : (
             <div>
               <p>No review yet.</p>
-              <button className='main-form-button' onClick={() => setIsEditMode(true)}>
+              <Button sx={{ m: 1,
+                          '@media (max-width: 600px)': {
+                              fontSize: '10px', // Adjust the font size for smaller screens
+                              padding: '3px 5px', // Adjust padding for smaller screens
+                          }, }} variant="contained" onClick={() => setIsEditMode(true)}>
                 Add Review
-              </button>
+              </Button>
+              <Button sx={{ m: 1,
+                          '@media (max-width: 600px)': {
+                              fontSize: '10px', // Adjust the font size for smaller screens
+                              padding: '3px 5px', // Adjust padding for smaller screens
+                          }, }} variant="contained"
+                        onClick={() => addToFavorites(searchResults)}
+                      >
+                        Add to Fav
+                      </Button>
+                      <Button sx={{ m: 1,
+                          '@media (max-width: 600px)': {
+                              fontSize: '10px', // Adjust the font size for smaller screens
+                              padding: '3px 5px', // Adjust padding for smaller screens
+                          }, }} variant="contained"
+                        onClick={() => addToWatchlist(searchResults)}
+                      >
+                        Add to Wlist
+                      </Button>
             </div>
           )}
         </div>
 
         <div className='recent-reviews'>
-  <h3>Recent Reviews for {searchResults.Title}</h3>
+  <b>Recent Reviews for {searchResults.Title}:</b>
   {Object.entries(recentReviews).map(([uid, review], index) => (
-    <div key={index} className='review'>
-      <p>Review by: {uid}</p>
-      <p>{review}</p>
+    <div key={index} className='review'>    
+    <Link href={`/user/${uid}`}>
+    <TextField sx={{ m: 2, width: '80ch',
+                          '@media (max-width: 600px)': {
+                              width:'30ch' // Adjust padding for smaller screens
+                          }, }} variant="standard"
+              id="outlined-read-only-input"
+              label={"Review by " +uid}
+              value={review}
+              InputProps={{
+                readOnly: true,
+              }}
+            /> 
+      </Link>
     </div>
   ))}
         </div>

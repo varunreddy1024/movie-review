@@ -1,9 +1,9 @@
 "use client"
-import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getDatabase, ref, onValue, push,set } from 'firebase/database';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useState, useEffect } from 'react';
+import { getDatabase, ref, onValue, push, set } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
@@ -19,15 +19,20 @@ const firebaseConfig = {
   databaseURL: "https://t-clone-45bd0-default-rtdb.firebaseio.com",
 };
 
-// Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
 
-const MovieSearch = ({ onSearch }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+const MovieReviewPage = () => {
+  const [movies, setMovies] = useState([]);
+  const [newMovieTitle, setNewMovieTitle] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
+  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const [editprofile, SetEditprofile] = useState(true);
+  const [searchResults, setSearchResults] = useState({});
   const [favorites, setFavorites] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
   const [reviewStatus, setReviewStatus] = useState({});
@@ -97,7 +102,84 @@ const MovieSearch = ({ onSearch }) => {
     return () => {
       unsubscribe();
     };
-  }, [user, auth, database]);
+  }, [user, database]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('movies',movies)
+        if(movies.length>0){
+          let movieNewData={};
+          for(var i=0;i<movies.length; i++){
+            console.log('loading',i);
+            const response = await fetch(`https://omdbapi.com/?i=${movies[i].imdbID}&apikey=8643ded5`);
+            if (!response.ok) {
+              console.log(`HTTP error! Status: ${response.status}`);
+              continue;
+            }
+            let data = await response.json();
+            movieNewData[movies[i].imdbID]= data;
+            setSearchResults(movieNewData)
+          }
+        setSearchResults(movieNewData);
+        console.log('movie Data',movieNewData);
+        }else{
+          console.log('movie length less tahn 0')
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+fetchData();
+  }, [movies]);
+  
+
+  useEffect(() => {
+    const reviewsRef = ref(database, `users/${user?.uid}/movies`);
+  
+    const handleData = (snapshot) => {
+      if (snapshot.exists()) {
+        const movieData = snapshot.val();
+        const movieList = Object.keys(movieData).map((key) => ({
+          id: key,
+          ...movieData[key],
+        }));
+        setMovies(movieList);
+        console.log(movieList);
+      } else {
+        setMovies([]);
+      }
+    };
+  
+    onValue(reviewsRef, handleData);
+  }, [ user]);
+  useEffect(() => {  
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+      if (user) {
+        const userReviewsRef = ref(database, `users/${user.uid}/movies`);
+
+        const userRef = ref(database, `users/${user.uid}`);
+        onValue(userRef, (snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            setName(userData.name || '');
+            setAge(userData.age || '');
+            console.log(userData.movies);
+            console.log(movies);
+          }
+        });
+      }
+    });
+  
+    return () => {
+      unsubscribe();
+    };
+  }, [ auth]);
+
+
+  console.log('intial movies',movies );
 
   const addToWatchlist = (movie) => {
     if (user) {
@@ -121,71 +203,28 @@ const MovieSearch = ({ onSearch }) => {
     }
   };
 
-  const handleSearch = async (e) => {
-    setSearchTerm(e.target.value);
-    const search = e.target.value.trim();
-    if (search === '') {
-      return false;
-    }
-    try {
-      const response = await fetch(
-        `https://omdbapi.com/?s=${search}&apikey=8643ded5`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      setSearchResults(data.Search || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
 
   return (
-    <>
-      {user ? (
-        <Card variant="outlined" className="movies-list-main">
-          <div className="main-form">
-            <div
-              style={{
-                float: 'right',
-                display: 'flex',
-                flexDirection: 'row',
-                width: '95%',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                margin: 'auto',
-                marginTop: '5px',
-              }}
-            >
-              <TextField
-                id="outlined-controlled"
-                label="Search"
-                value={searchTerm}
-                onChange={handleSearch}
-                style={{ float: 'right' }}
-              />
-            </div>
-          </div>
+    <div>
+      {user && (
+        <Card variant="outlined"  className='movies-list-main'>
 
-          <div>
-            <ul>
-              {searchResults.map((movie) => (
-                <li key={movie.imdbID}>
-                  <div className="review-main">
-                    <div className="review-list-poster">
+          <h2 className='color-red-bold'>Your Recent Reviews:</h2>
+
+          <ul>
+            {movies.map((movie) => (
+              <li key={movie.imdbID}>
+                  <div className='review-main'>
+                    <div className='review-list-poster'>
                       <img
-                        src={movie.Poster}
-                        alt={`${movie.Title} Poster`}
+                        src={movie.poster}
+                        alt={`${movie.title} Poster`}
                         style={{ width: '75px', height: '110px' }}
                       />
                     </div>
-                    <div className="review-list-main">
-                      <p className="review-name">{movie.Title}</p>
-                      <p>{movie.Year}, {movie.Type}</p>
+                    <div className='review-list-main'>
+                      <p className='review-name'>{movie.title}</p>
+                      <p>Review: {movie.review.trim().slice(0,200)}{movie.review.length > 200 && '...'}</p>
                       <Link href={`/movie/${movie.imdbID}`}>
                         <Button sx={{ m: 1 ,
                           '@media (max-width: 600px)': {
@@ -223,16 +262,13 @@ const MovieSearch = ({ onSearch }) => {
                       </Button>
                     </div>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+              </li>
+            ))}
+          </ul>
         </Card>
-      ) : (
-        <h2> Login To Access</h2>
-      )}
-    </>
+      ) }
+    </div>
   );
 };
 
-export default MovieSearch;
+export default MovieReviewPage;
