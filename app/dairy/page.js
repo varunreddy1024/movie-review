@@ -1,7 +1,14 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, onValue, push, update, remove } from 'firebase/database';
+import {
+  getDatabase,
+  ref,
+  onValue,
+  push,
+  update,
+  remove
+} from 'firebase/database';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 
@@ -76,10 +83,9 @@ const Diary = () => {
       return;
     }
     if (user) {
-        const dairyRef = editEntryId
-        ? ref(database, `users/${user.uid}/dairy/${editEntryId}`)
-        : ref(database, `users/${user.uid}/dairy`);
-      
+      const dairyRef = editEntryId ?
+        ref(database, `users/${user.uid}/dairy/${editEntryId}`) :
+        ref(database, `users/${user.uid}/dairy`);
 
       if (editMode && editEntryId) {
         // Update the existing entry
@@ -122,80 +128,106 @@ const Diary = () => {
   const handleDeleteEntry = (entryId) => {
     if (user) {
       const dairyRef = ref(database, `users/${user.uid}/dairy/${entryId}`);
-  
+
       // Remove the entry from the database
       remove(dairyRef);
     }
   };
 
   return (
-    
-  <>
+    <>
+      {user ? (
+        <Card variant="outlined" className='movies-list-main'>
+          {showForm ? (
+            <>
+              <div>
+                <TextField
+                  sx={{ m: 2, width: '25ch' }}
+                  id="standard-multiline-flexible"
+                  label="Title"
+                  multiline
+                  maxRows={4}
+                  variant="filled"
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                <input
+                  style={{ margin: '20px', height: '56px' }}
+                  type="date"
+                  value={customDate}
+                  onChange={(e) => setCustomDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <TextField
+                  sx={{
+                    m: 2,
+                    width: '75ch',
+                    '@media (max-width: 600px)': {
+                      width: '30ch', // Adjust padding for smaller screens
+                    },
+                  }}
+                  variant="standard"
+                  label="Write"
+                  multiline
+                  type="text"
+                  value={entry}
+                  onChange={(e) => setEntry(e.target.value)}
+                />
+              </div>
+              <Button
+                sx={{ m: 2 }}
+                variant="outlined"
+                onClick={handleSaveEntry}
+              >
+                {editMode ? 'Update Entry' : 'Save Entry'}
+              </Button>
+            </>
+          ) : (
+            <Button
+              sx={{ m: 2 }}
+              variant="outlined"
+              onClick={() => setShowForm(true)}
+            >
+              {editMode ? 'Edit Entry' : 'Write Diary'}
+            </Button>
+          )}
 
-   {user?( <Card variant="outlined" className='movies-list-main'>
-   {showForm ? (
-     <>
-       <div>
-         <TextField
-       sx={{ m: 2, width: '25ch' }}
-       id="standard-multiline-flexible"
-       label="Title"
-       multiline
-       maxRows={4}
-       variant="filled"
-       type="text"
-       value={title}
-       onChange={(e) => setTitle(e.target.value)}
-         />
-         <input style={{
-           margin: '20px',
-           height:'56px'}}
-           type="date"
-           value={customDate}
-           onChange={(e) => setCustomDate(e.target.value)}
-         />
-       </div>
-       <div>
-           <TextField sx={{ m: 2, width: '75ch' ,
-                       '@media (max-width: 600px)': {
-                         width: '30ch'  // Adjust padding for smaller screens
-                       }, }} variant="standard"
-       label="Write"
-       multiline
-       type="text"
-       value={entry}
-       onChange={(e) => setEntry(e.target.value)}
-         />
-       </div>
-       <Button sx={{ m: 2}} variant="outlined" onClick={handleSaveEntry}>{editMode ? 'Update Entry' : 'Save Entry'}</Button>
-     </>
-   ) : (
-     <Button sx={{ m: 2}}  variant="outlined" onClick={() => setShowForm(true)}>{editMode ? 'Edit Entry' : 'Write Diary'}</Button>
-   )}
-
-   <h2 style={{
- margin: '20px'}}>Your Diary Entries</h2>
-   <div className='dairy-main'>
-   <ul>
-     {dairyEntries.map((entry) => (
-         <div className='dairy-item-main'>
-       <li key={entry.id}>
-         <strong>{entry.title}</strong> - {entry.customDate}
-         <p>{entry.entry}</p>
-         <Button sx={{ m: 1}} variant="outlined" size="medium" onClick={() => handleEditEntry(entry.id)}>Edit</Button>
-         <Button sx={{ m: 1 }} variant="outlined" startIcon={<DeleteIcon />} onClick={() => handleDeleteEntry(entry.id)}>Delete</Button>
-       </li>
-       </div>
-     ))}
-     
-   </ul>
-   </div>
- </Card>):(
-  <h2>Login to <Access></Access></h2>
- )}
-
-  </>
-   
+          <h2 style={{ margin: '20px' }}>Your Diary Entries</h2>
+          <div className='dairy-main'>
+            <ul>
+              {dairyEntries.map((entry) => (
+                <div className='dairy-item-main' key={entry.id}>
+                  <li>
+                    <strong>{entry.title}</strong> - {entry.customDate}
+                    <p>{entry.entry}</p>
+                    <Button
+                      sx={{ m: 1 }}
+                      variant="outlined"
+                      size="medium"
+                      onClick={() => handleEditEntry(entry.id)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      sx={{ m: 1 }}
+                      variant="outlined"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => handleDeleteEntry(entry.id)}
+                    >
+                      Delete
+                    </Button>
+                  </li>
+                </div>
+              ))}
+            </ul>
+          </div>
+        </Card>
+      ) : (
+        <h2>Login to Access</h2>
+      )}
+    </>
   );
 };
 
